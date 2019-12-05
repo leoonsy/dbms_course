@@ -1,0 +1,1 @@
+//= ../../../node_modules/fancygrid/client/fancy.min.js

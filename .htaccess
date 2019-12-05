@@ -1,0 +1,49 @@
+AddDefaultCharset UTF-8
+
+php_value display_errors 1
+php_value display_startup_errors 1
+php_value error_reporting E_ALL;
+php_value default_charset utf-8
+
+Options All -Indexes -Includes +FollowSymLinks
+
+DirectoryIndex index.php
+
+<IfModule mod_setenvif.c>
+	SetEnv TZ Europe/Moscow
+</IfModule>
+
+ServerSignature Off
+
+RewriteEngine on
+RewriteBase /
+
+# Удаление www
+RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+# Убираем index.php на конце
+RewriteCond %{REQUEST_URI} ^(.*)/index\.php$
+RewriteRule ^(.*)/?index\.php$ /$1 [R=301,L]
+	
+# Убираем повторяющиеся слеши в корне
+RewriteCond %{THE_REQUEST} \s/{2,}
+RewriteRule (.*) $1 [R=301,L]	
+	
+# Убираем повторяющиеся слеши в URI
+RewriteCond %{REQUEST_URI} ^(.*)/{2,}(.*)$
+RewriteRule . %1/%2 [R=301,L]
+
+# Убираем слеши в конце
+RewriteCond %{REQUEST_URI} ^(.*)/$
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule . %1 [R=301,L]
+
+#для разработки - отключаем кеширование
+Header unset ETag
+FileETag None
+
+<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css)$">
+Header unset Last-Modified
+</FilesMatch>

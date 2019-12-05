@@ -1,0 +1,59 @@
+@import "_variables";
+
+@import "../../../node_modules/bootstrap/scss/_functions";
+@import "../../../node_modules/bootstrap/scss/_mixins";
+@import "../../../node_modules/bootstrap/scss/_variables";
+
+/** Общее **/
+html,
+body {
+  height: 100%;
+  min-width: 240px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+}
+
+#wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+#content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#footer {
+  flex: 0 0 auto;
+}
+
+a,
+a:active,
+a:link,
+a:visited,
+a:focus {
+  color: $link-color;
+  transition: color 0.3s ease 0s;
+}
+
+a:hover {
+  text-decoration: none;
+  color: $link-hover-color;
+}
+
+//--Main--//
+.account {
+  margin-top: 15px;
+
+  &__divider {
+    margin: 0 5px;
+    color: rgb(131, 131, 131);
+  }
+}
+
+.mainTable {
+  margin: 0 auto;
+}
