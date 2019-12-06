@@ -17,7 +17,7 @@ class Db {
 		return self::$instance;
 	}
 
-	public function setPDOConfig() {
+	private function setPDOConfig() {
 		$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 

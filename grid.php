@@ -43,17 +43,7 @@ ini_set('error_reporting', (string) E_ALL);
             </div>
             <div class="container panel">
                 <div class="row">
-                    <nav class="panel__nav col-12">
-                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                            <a class="nav-item nav-link active" id="nav-categories-tab" data-toggle="tab" href="#mainTable">Категории</a>
-                            <a class="nav-item nav-link" id="nav-products-tab" data-toggle="tab" href="#mainTable">Продукты</a>
-                            <a class="nav-item nav-link" id="nav-orders-tab" data-toggle="tab" href="#mainTable">Заказы</a>
-                            <a class="nav-item nav-link" id="nav-customers-tab" data-toggle="tab" href="#mainTable">Покупатели</a>
-                        </div>
-                    </nav>
-                    <div class="tab-content col-12" id="nav-tabContent">
-                        <div class="tab-pane fade show active mainTable" id="mainTable"></div>
-                    </div>
+                    <div class="col-12 panel__mainTable" id="mainTable"></div>
                 </div>
             </div>
         </div>
@@ -71,126 +61,224 @@ ini_set('error_reporting', (string) E_ALL);
 
     <script>
         $(function() {
-
-            let data = [{
-                    "id": 1,
-                    "name": "Ted",
-                    "surname": "Smith",
-                    "company": "Electrical Systems",
-                    "age": 30
-                },
-                {
-                    "id": 2,
-                    "name": "Ed",
-                    "surname": "Johnson",
-                    "company": "Energy and Oil",
-                    "age": 35
-                },
-                {
-                    "id": 3,
-                    "name": "Test",
-                    "surname": "Sunovich",
-                    "company": "Lalala",
-                    "age": 22
-                }
-            ];
-
             let baseApiPath = "api.php";
-            let apiPath = `${baseApiPath}?table=categories`;
 
-            let grid = new FancyGrid({
+            let cols = {
+                categories: [{
+                    index: 'id',
+                    title: 'ID',
+                    type: 'number',
+                    locked: true,
+                    width: 50
+                }, {
+                    index: 'name',
+                    title: 'Имя',
+                    type: 'string',
+                    width: 200
+                }],
+                products: [{
+                    index: 'id',
+                    title: 'ID',
+                    type: 'number',
+                    locked: true,
+                    width: 50
+                }, {
+                    index: 'category_id',
+                    title: 'ID категории',
+                    type: 'number',
+                    width: 110
+                }, {
+                    index: 'name',
+                    title: 'Имя',
+                    type: 'string',
+                    width: 200
+                }, {
+                    index: 'price',
+                    title: 'Цена',
+                    type: 'number',
+                    width: 80
+                }, {
+                    index: 'count',
+                    title: 'Количество',
+                    type: 'string',
+                    width: 90
+                }],
+                orders: [{
+                    index: 'id',
+                    title: 'ID',
+                    type: 'number',
+                    locked: true,
+                    width: 50
+                }, {
+                    index: 'customer_id',
+                    title: 'ID покупателя',
+                    type: 'number',
+                    width: 110
+                }, {
+                    index: 'product_id',
+                    title: 'ID товара',
+                    type: 'number',
+                    width: 80
+                }, {
+                    index: 'product_count',
+                    title: 'Количество товаров',
+                    type: 'number',
+                    width: 150
+                }, {
+                    index: 'price',
+                    title: 'Цена',
+                    type: 'number',
+                    width: 80
+                }],
+                customers: [{
+                    index: 'id',
+                    title: 'ID',
+                    type: 'number',
+                    locked: true,
+                    width: 50
+                }, {
+                    index: 'first_name',
+                    title: 'Имя',
+                    type: 'string'
+                }, {
+                    index: 'last_name',
+                    title: 'Фамилия',
+                    type: 'string'
+                }]
+            };
+
+            let defaults = {
+                type: 'string',
+                width: 150,
+                resizable: true,
+                sortable: true,
+                editable: true
+            }
+
+            let tbar = [{
+                text: 'Добавить',
+                action: 'add'
+            }, {
+                text: 'Удалить',
+                action: 'remove',
+                tip: 'Select one or more rows to remove.'
+            }, {
+                type: 'search',
+                width: 350,
+                emptyText: 'Поиск',
+                paramsMenu: true,
+                paramsText: 'Параметры'
+            }];
+
+            let paging = {
+                pageSize: 20,
+                pageSizeData: [5, 10, 20, 50, 100, 500, 1000]
+            };
+
+            let clicksToEdit = 2,
+                i18n = 'ru';
+
+            let grid = new FancyTab({
                 resizable: true,
                 renderTo: 'mainTable',
                 title: 'База данных компьютерного магазина',
                 height: 450,
                 trackOver: true,
-                selModel: 'rows',
-                data: {
-                    proxy: {
-                        type: 'rest',
-                        url: apiPath
+                items: [{
+                        title: 'Категории',
+                        selModel: 'rows',
+                        type: 'grid',
+                        data: {
+                            proxy: {
+                                type: 'rest',
+                                url: `${baseApiPath}?table=categories`
+                            }
+                        },
+                        defaults: defaults,
+                        columns: cols.categories,
+                        tbar: tbar,
+                        clicksToEdit: clicksToEdit,
+                        paging: paging,
+                        i18n: i18n
+                    },
+                    {
+                        title: 'Продукты',
+                        selModel: 'rows',
+                        type: 'grid',
+                        data: {
+                            proxy: {
+                                type: 'rest',
+                                url: `${baseApiPath}?table=products`
+                            }
+                        },
+                        defaults: defaults,
+                        columns: cols.products,
+                        tbar: tbar,
+                        clicksToEdit: clicksToEdit,
+                        paging: paging,
+                        i18n: i18n
+                    },
+                    {
+                        title: 'Заказы',
+                        selModel: 'rows',
+                        type: 'grid',
+                        data: {
+                            proxy: {
+                                type: 'rest',
+                                url: `${baseApiPath}?table=orders`
+                            }
+                        },
+                        defaults: defaults,
+                        columns: cols.orders,
+                        tbar: tbar,
+                        clicksToEdit: clicksToEdit,
+                        paging: paging,
+                        i18n: i18n
+                    },
+                    {
+                        title: 'Покупатели',
+                        selModel: 'rows',
+                        type: 'grid',
+                        data: {
+                            proxy: {
+                                type: 'rest',
+                                url: `${baseApiPath}?table=customers`
+                            }
+                        },
+                        defaults: defaults,
+                        columns: cols.customers,
+                        tbar: tbar,
+                        clicksToEdit: clicksToEdit,
+                        paging: paging,
+                        i18n: i18n
                     }
-                },
-                tbar: [{
-                    text: 'Добавить',
-                    action: 'add'
-                }, {
-                    text: 'Удалить',
-                    action: 'remove',
-                    tip: 'Select one or more rows to remove.'
-                }, {
-                    type: 'search',
-                    width: 350,
-                    emptyText: 'Поиск',
-                    paramsMenu: true,
-                    paramsText: 'Параметры'
-                }],
-                defaults: {
-                    type: 'string',
-                    width: 75,
-                    resizable: true,
-                    sortable: true,
-                    editable: true
-                },
-                clicksToEdit: 2,
-                paging: {
-                    pageSize: 20,
-                    pageSizeData: [5, 10, 20, 50, 100, 500, 1000]
-                },
-                i18n: 'ru',
-                columns: [{
-                    index: 'id',
-                    title: 'Id',
-                    type: 'number',
-                    locked: true,
-                    width: 100
-                }, {
-                    index: 'company',
-                    title: 'Company',
-                    type: 'string',
-                    width: 100
-                }, {
-                    index: 'name',
-                    title: 'Name',
-                    type: 'string',
-                    width: 100
-                }, {
-                    index: 'surname',
-                    title: 'Sur Name',
-                    type: 'string',
-                    width: 100
-                }, {
-                    index: 'age',
-                    title: 'Age',
-                    type: 'number',
-                    width: 100
-                }]
+                ]
             })
 
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-                switch (e.target.id) {
-                    case 'nav-categories-tab':
-                        apiPath = `${baseApiPath}?table=categories`;
-                        break;
+            // $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+            //     switch (e.target.id) {
+            //         case 'nav-categories-tab':
+            //             apiPath = `${baseApiPath}?table=categories`;
+            //             break;
 
-                    case 'nav-products-tab':
-                        apiPath = `${baseApiPath}?table=products`;
-                        break;
+            //         case 'nav-products-tab':
+            //             apiPath = `${baseApiPath}?table=products`;
+            //             break;
 
-                    case 'nav-orders-tab':
-                        apiPath = `${baseApiPath}?table=orders`;
-                        break;
+            //         case 'nav-orders-tab':
+            //             apiPath = `${baseApiPath}?table=orders`;
+            //             break;
 
-                    case 'nav-customers-tab':
-                        apiPath = `${baseApiPath}?table=customers`;
-                        break;
+            //         case 'nav-customers-tab':
+            //             apiPath = `${baseApiPath}?table=customers`;
+            //             break;
 
-                    default:
-                        throw new Exception('Не определена таблица базы данных');
-                }
-                grid.setUrl(apiPath);
-                grid.load();
-            });
+            //         default:
+            //             throw new Exception('Не определена таблица базы данных');
+            //     }
+            //     grid.setUrl(apiPath);
+            //     grid.load();
+            // });
         });
     </script>
 </body>

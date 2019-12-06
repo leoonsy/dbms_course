@@ -54,6 +54,9 @@ a:hover {
   }
 }
 
-.mainTable {
-  margin: 0 auto;
+.panel {
+  margin-top: 15px;
+  &__mainTable {
+    margin: 0 auto;
+  }
 }
