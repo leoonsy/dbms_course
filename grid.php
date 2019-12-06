@@ -69,7 +69,8 @@ ini_set('error_reporting', (string) E_ALL);
                     title: 'ID',
                     type: 'number',
                     locked: true,
-                    width: 50
+                    width: 50,
+                    editable: false
                 }, {
                     index: 'name',
                     title: 'Имя',
@@ -81,7 +82,8 @@ ini_set('error_reporting', (string) E_ALL);
                     title: 'ID',
                     type: 'number',
                     locked: true,
-                    width: 50
+                    width: 50,
+                    editable: false
                 }, {
                     index: 'category_id',
                     title: 'ID категории',
@@ -108,7 +110,8 @@ ini_set('error_reporting', (string) E_ALL);
                     title: 'ID',
                     type: 'number',
                     locked: true,
-                    width: 50
+                    width: 50,
+                    editable: false
                 }, {
                     index: 'customer_id',
                     title: 'ID покупателя',
@@ -135,7 +138,8 @@ ini_set('error_reporting', (string) E_ALL);
                     title: 'ID',
                     type: 'number',
                     locked: true,
-                    width: 50
+                    width: 50,
+                    editable: false
                 }, {
                     index: 'first_name',
                     title: 'Имя',
@@ -170,6 +174,11 @@ ini_set('error_reporting', (string) E_ALL);
                 paramsText: 'Параметры'
             }];
 
+            //кнопки должны быть в отдельной памяти для каждой таблицы (отак как привязывается к таблице)
+            let tbarProducts = JSON.parse(JSON.stringify(tbar));
+            let tbarOrders = JSON.parse(JSON.stringify(tbar));
+            let tbarCustomers = JSON.parse(JSON.stringify(tbar));
+
             let paging = {
                 pageSize: 20,
                 pageSizeData: [5, 10, 20, 50, 100, 500, 1000]
@@ -179,10 +188,10 @@ ini_set('error_reporting', (string) E_ALL);
                 i18n = 'ru';
 
             let grid = new FancyTab({
-                resizable: true,
+                resizable: false,
                 renderTo: 'mainTable',
                 title: 'База данных компьютерного магазина',
-                height: 450,
+                height: 650,
                 trackOver: true,
                 items: [{
                         title: 'Категории',
@@ -191,7 +200,8 @@ ini_set('error_reporting', (string) E_ALL);
                         data: {
                             proxy: {
                                 type: 'rest',
-                                url: `${baseApiPath}?table=categories`
+                                url: `${baseApiPath}?table=categories`,
+                                afterRequest: updateAfterRequest
                             }
                         },
                         defaults: defaults,
@@ -208,12 +218,13 @@ ini_set('error_reporting', (string) E_ALL);
                         data: {
                             proxy: {
                                 type: 'rest',
-                                url: `${baseApiPath}?table=products`
+                                url: `${baseApiPath}?table=products`,
+                                afterRequest: updateAfterRequest
                             }
                         },
                         defaults: defaults,
                         columns: cols.products,
-                        tbar: tbar,
+                        tbar: tbarProducts,
                         clicksToEdit: clicksToEdit,
                         paging: paging,
                         i18n: i18n
@@ -225,12 +236,13 @@ ini_set('error_reporting', (string) E_ALL);
                         data: {
                             proxy: {
                                 type: 'rest',
-                                url: `${baseApiPath}?table=orders`
+                                url: `${baseApiPath}?table=orders`,
+                                afterRequest: updateAfterRequest
                             }
                         },
                         defaults: defaults,
                         columns: cols.orders,
-                        tbar: tbar,
+                        tbar: tbarOrders,
                         clicksToEdit: clicksToEdit,
                         paging: paging,
                         i18n: i18n
@@ -242,12 +254,13 @@ ini_set('error_reporting', (string) E_ALL);
                         data: {
                             proxy: {
                                 type: 'rest',
-                                url: `${baseApiPath}?table=customers`
+                                url: `${baseApiPath}?table=customers`,
+                                afterRequest: updateAfterRequest
                             }
                         },
                         defaults: defaults,
                         columns: cols.customers,
-                        tbar: tbar,
+                        tbar: tbarCustomers,
                         clicksToEdit: clicksToEdit,
                         paging: paging,
                         i18n: i18n
@@ -255,30 +268,21 @@ ini_set('error_reporting', (string) E_ALL);
                 ]
             })
 
-            // $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-            //     switch (e.target.id) {
-            //         case 'nav-categories-tab':
-            //             apiPath = `${baseApiPath}?table=categories`;
-            //             break;
+            //обновляет вкладки (кроме текущей) после удаления строк
+            function updateAfterRequest(o) {
+                if (o.type == 'destroy') {
+                    let activeTab = grid.activeTab;
+                    if (activeTab != 0 && activeTab != 3) //рассматриваем только "категории" и "покупатели" (для оптимизации)
+                        return o;
 
-            //         case 'nav-products-tab':
-            //             apiPath = `${baseApiPath}?table=products`;
-            //             break;
-
-            //         case 'nav-orders-tab':
-            //             apiPath = `${baseApiPath}?table=orders`;
-            //             break;
-
-            //         case 'nav-customers-tab':
-            //             apiPath = `${baseApiPath}?table=customers`;
-            //             break;
-
-            //         default:
-            //             throw new Exception('Не определена таблица базы данных');
-            //     }
-            //     grid.setUrl(apiPath);
-            //     grid.load();
-            // });
+                    for (let i = 0; i < grid.items.length; i++) {
+                        if (i != activeTab && grid.items[i].load != undefined) {
+                            grid.items[i].load(); //запрос к серверу для получения данных
+                        }
+                    }
+                }
+                return o;
+            }
         });
     </script>
 </body>
