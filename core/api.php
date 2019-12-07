@@ -1,18 +1,11 @@
 <?php
-
-declare(strict_types=1);
-mb_internal_encoding("UTF-8");
-
-ini_set('display_errors', (string) 1);
-ini_set('display_startup_errors', (string) 1);
-ini_set('error_reporting', (string) E_ALL);
-
 require_once 'config.php';
 require_once 'db.php';
 require_once 'rest.php';
 require_once 'account.php';
 
 header('Content-Type: application/json');
+
 $account = new Account();
 $role = $account->getRole();
 $aclActions = $account->getAclActions($role);

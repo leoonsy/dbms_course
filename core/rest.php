@@ -1,6 +1,5 @@
 <?php
 //инициализация массивов $_PUT и $_POST
-
 $_PUT = [];
 $_DELETE = [];
 
@@ -10,6 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT')
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE')
     $_DELETE = getFormData('DELETE');
 
+/**
+ * Получить массив с данными из application/x-www-form-urlencoded
+ *
+ * @param string $method
+ * @return array
+ */
 function getFormData($method)
 {
     // GET или POST: данные возвращаем как есть

@@ -4,6 +4,11 @@ require_once 'db.php';
 
 class Account
 {
+    /**
+     * Права доступа к БД
+     *
+     * @var array
+     */
     private $aclActions = [
         'guest' => [
             'select' => false,
@@ -25,6 +30,12 @@ class Account
         ]
     ];
 
+    /**
+     * Получить права доступа к БД
+     *
+     * @param string $role
+     * @return array
+     */
     public function getAclActions($role)
     {
         return $this->aclActions[$role];
@@ -35,6 +46,11 @@ class Account
         session_start();
     }
 
+    /**
+     * Получить роль
+     *
+     * @return string
+     */
     public function getRole()
     {
         if (isset($_SESSION['login']))
@@ -43,6 +59,13 @@ class Account
         return 'guest';
     }
 
+    /**
+     * Аутентификация пользователя
+     *
+     * @param string $login
+     * @param string $password
+     * @return bool
+     */
     public function authenticate($login, $password)
     {
         $db = Db::getDBO();
@@ -55,9 +78,14 @@ class Account
             $_SESSION['role'] = $account['role'];
             return true;
         }
-        return false;
+        return false;       
     }
 
+    /**
+     * Уничтожение сессии (выход)
+     *
+     * @return void
+     */
     public function logout()
     {
         session_destroy();
