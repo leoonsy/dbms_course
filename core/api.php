@@ -10,8 +10,18 @@ ini_set('error_reporting', (string) E_ALL);
 require_once 'config.php';
 require_once 'db.php';
 require_once 'rest.php';
+require_once 'account.php';
 
 header('Content-Type: application/json');
+$account = new Account();
+$role = $account->getRole();
+$aclActions = $account->getAclActions($role);
+
+//запрос на получение прав для действий над таблицей
+if (isset($_GET['acl'])) {
+	echo json_encode($aclActions);
+	exit();
+}
 
 $db = Db::getDBO();
 
@@ -19,6 +29,9 @@ $tables = ['categories', 'products', 'orders', 'customers'];
 
 //удаление строки
 if (isset($_DELETE['id'])) {
+	if (!$aclActions['delete'])
+		sendResponse(false);
+
 	$id = $_DELETE['id'];
 	if (!is_numeric($id))
 		sendResponse(false);
@@ -37,6 +50,9 @@ if (isset($_DELETE['id'])) {
 
 //добавление строки
 if (isset($_POST['id'])) {
+	if (!$aclActions['insert'])
+		sendResponse(false);
+
 	$table = $_GET['table'] ?? null;
 	if (!in_array($table, $tables))
 		sendResponse(false);
@@ -63,6 +79,9 @@ if (isset($_POST['id'])) {
 
 //изменение таблицы
 if (isset($_PUT['id'])) {
+	if (!$aclActions['update'])
+		sendResponse(false);
+
 	$id = $_PUT['id'];
 
 	if (isset($_PUT['key']))
@@ -87,6 +106,9 @@ if (isset($_PUT['id'])) {
 
 //получение таблицы
 if (isset($_GET['table'])) {
+	if (!$aclActions['select'])
+		sendResponse(false);
+
 	$table = $_GET['table'];
 	if (!in_array($table, $tables))
 		sendResponse(false);
@@ -97,6 +119,13 @@ if (isset($_GET['table'])) {
 
 sendResponse(false);
 
+/**
+ * Ответ в виде json
+ *
+ * @param bool $error
+ * @param array $data
+ * @return void
+ */
 function sendResponse($error, $data = [])
 {
 	echo json_encode(['success' => $error, 'data' => $data]);

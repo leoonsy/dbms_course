@@ -6,4 +6,5 @@ abstract class Config
 	const DB_USER = "leoon";
 	const DB_PASSWORD = "1762354";
 	const DB_NAME = "dbms_course";
+	const SITE_NAME = "http://dbms-course.ru";
 }

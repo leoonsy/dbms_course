@@ -7,6 +7,16 @@ mb_internal_encoding("UTF-8");
 ini_set('display_errors', (string) 1);
 ini_set('display_startup_errors', (string) 1);
 ini_set('error_reporting', (string) E_ALL);
+
+require 'core/account.php';
+
+$account = new Account();
+if ($account->getRole() === 'guest') {
+    header('Location: ' . Config::SITE_NAME . '/');
+    exit();
+}
+
+$login = $_SESSION['login'];
 ?>
 
 <!DOCTYPE html>
@@ -35,9 +45,11 @@ ini_set('error_reporting', (string) E_ALL);
             <div class="container account">
                 <div class="row justify-content-end">
                     <div class="col-auto">
-                        <span>Добро пожаловать, </span><b class="account__name">Admin</b>!
+                        <span>Добро пожаловать, </span><b class="account__name">
+                            <?= $login ?>!
+                        </b>
                         <span class="account__divider">|</span>
-                        <a href="#" class="account__logout">Выйти</a>
+                        <a href="/?logout" class="account__logout">Выйти</a>
                     </div>
                 </div>
             </div>
@@ -61,7 +73,18 @@ ini_set('error_reporting', (string) E_ALL);
 
     <script>
         $(function() {
-            let baseApiPath = "api.php";
+            let baseApiPath = "core/api.php";
+            let acl = [];
+
+            $.ajax({
+                url: 'core/api.php?acl',
+                method: 'get',
+                dataType: 'json',
+                async: false,
+                success: function(data) {
+                    acl = data;
+                }
+            });
 
             let cols = {
                 categories: [{
@@ -156,23 +179,31 @@ ini_set('error_reporting', (string) E_ALL);
                 width: 150,
                 resizable: true,
                 sortable: true,
-                editable: true
+                editable: acl.update
             }
 
             let tbar = [{
+                key: 'insert',
                 text: 'Добавить',
                 action: 'add'
             }, {
+                key: 'delete',
                 text: 'Удалить',
                 action: 'remove',
-                tip: 'Select one or more rows to remove.'
+                tip: 'Выделите строки для удаления'
             }, {
+                key: 'search',
                 type: 'search',
                 width: 350,
                 emptyText: 'Поиск',
                 paramsMenu: true,
                 paramsText: 'Параметры'
             }];
+
+            //отключаем кнопки в зависимости от прав доступа
+            tbar = tbar.filter((item, index, array) => {
+                return !(acl[item.key] === false);
+            });
 
             //кнопки должны быть в отдельной памяти для каждой таблицы (отак как привязывается к таблице)
             let tbarProducts = JSON.parse(JSON.stringify(tbar));
