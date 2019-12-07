@@ -131,7 +131,7 @@ $(function () {
         return !(acl[item.key] === false);
     });
 
-    //кнопки должны быть в отдельной памяти для каждой таблицы (отак как привязывается к таблице)
+    //кнопки должны быть в отдельной памяти для каждой таблицы (так как привязывается к таблице)
     let tbarProducts = JSON.parse(JSON.stringify(tbar));
     let tbarOrders = JSON.parse(JSON.stringify(tbar));
     let tbarCustomers = JSON.parse(JSON.stringify(tbar));
