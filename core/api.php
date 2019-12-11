@@ -18,6 +18,18 @@ if (isset($_GET['acl'])) {
 
 $db = Db::getDBO();
 
+//запрос на получение соответствия id и имени для таблиц
+if (isset($_GET['reference'])) {
+	$result = [
+		'categories' => $db->getAll("SELECT id, name FROM categories"),
+		'products' => $db->getAll("SELECT id, name FROM products"),
+		'customers' => $db->getAll("SELECT id, CONCAT(first_name, ' ', last_name) as name FROM customers")
+	];
+
+	echo json_encode($result);
+	exit();
+}
+
 $tables = ['categories', 'products', 'orders', 'customers'];
 
 //удаление строки
