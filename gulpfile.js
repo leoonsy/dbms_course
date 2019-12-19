@@ -244,6 +244,7 @@ gulp.task('watch', function () {
   gulp.watch(path.src[key] + path.watch.scss, gulp.series('scss:build'));
   gulp.watch(path.src[key] + path.watch.js, gulp.series('js:build'));
   gulp.watch(path.src[key] + path.watch.html, gulp.series('html:build'));
+  gulp.watch(path.src[key] + path.watch.img, gulp.series('img:build'));
 });
 
 // очистка кэша
